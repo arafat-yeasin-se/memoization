@@ -34,21 +34,23 @@ function memoize(func, resolver, timeout) {
     function getNow() {
         return Date.now();
     }
+    let cacheValidUntil = getNow();
 
-    let cacheValidUntil = getNow() + timeout;
-
-    if (typeof timeout !== 'undefined') {
-
-    }
-    if (typeof resolver !== 'undefined') {
-
+    if (typeof timeout !== 'undefined' && typeof timeout === 'number') {
+        cacheValidUntil = getNow() + timeout;
     }
 
     return function () {
-        let isTimeoutExceeds = cacheValidUntil - getNow();
-        let cacheKey = JSON.stringify(arguments);
-        if (cache[cacheKey] && isTimeoutExceeds >= 0) {
-            console.log("Return From Cache ..." + cacheKey);
+        let remainingValidity = cacheValidUntil - getNow();
+        let cacheKey;
+        if ((typeof resolver !== 'undefined' && typeof resolver === 'function') && typeof resolver() !== 'undefined') {
+            cacheKey = JSON.stringify(resolver());
+        }else {
+            cacheKey = JSON.stringify(arguments);
+        }
+        console.log("cacheKey ..."+cacheKey);
+        if (cache[cacheKey] && remainingValidity >= 0) {
+            console.log("Return From Cache ...");
             return cache[cacheKey];
         } else {
             console.log("Executing Function ...");
