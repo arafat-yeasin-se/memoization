@@ -30,26 +30,28 @@
 function memoize(func, resolver, timeout) {
     // TODO implement the memoize function
     let cache = {};
+    let cacheValidTime;
 
     function getNow() {
         return Date.now();
     }
-    let cacheValidUntil = getNow();
+
+    cacheValidTime = getNow();
 
     if (typeof timeout !== 'undefined' && typeof timeout === 'number') {
-        cacheValidUntil = getNow() + timeout;
+        cacheValidTime = getNow() + timeout;
     }
 
     return function () {
-        let remainingValidity = cacheValidUntil - getNow();
+        let remainingValidTime = cacheValidTime - getNow();
         let cacheKey;
         if ((typeof resolver !== 'undefined' && typeof resolver === 'function') && typeof resolver() !== 'undefined') {
             cacheKey = JSON.stringify(resolver());
-        }else {
+        } else {
             cacheKey = JSON.stringify(arguments);
         }
-        console.log("cacheKey ..."+cacheKey);
-        if (cache[cacheKey] && remainingValidity >= 0) {
+        console.log("cacheKey ..." + cacheKey);
+        if (cache[cacheKey] && remainingValidTime >= 0) {
             console.log("Return From Cache ...");
             return cache[cacheKey];
         } else {
