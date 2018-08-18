@@ -29,7 +29,26 @@
  */
 function memoize(func, resolver, timeout) {
     // TODO implement the memoize function
-    return func;
+    let cache = {};
+
+    if(typeof timeout !== 'undefined'){
+        
+    }
+    if(typeof resolver !== 'undefined'){
+
+    }
+    return function () {
+        let cacheKey = JSON.stringify(arguments);
+        if(cache[cacheKey]){
+            console.log("Return From Cache ...");
+            return cache[cacheKey];
+        }else{
+            console.log("Executing Function ...");
+            let value = func.apply(this, arguments);
+            cache[cacheKey] = value;
+            return value;
+        }
+    }
 }
 
 module.exports = {
