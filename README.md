@@ -2,5 +2,12 @@
 
 A general introduction into memoization: https://en.wikipedia.org/wiki/Memoization
 
-See memoization.js and test.js for the required functionality. Please provide a
-design rationale documenting your decisions (in code).
+Please clone the project: https://github.com/arafat-yeasin-se/memoization.git
+
+Or, download from (https://github.com/arafat-yeasin-se/memoization)
+
+##### Run following commands to execute test.js
+```
+npm install
+npm test
+```
