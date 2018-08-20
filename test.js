@@ -5,7 +5,7 @@ const sinon = require('sinon');
 // hint: use https://sinonjs.org/releases/v6.1.5/fake-timers/ for faking timeouts
 
 describe('memoization', function () {
-    //Test Case 1
+    //Test Case
     it('should memoize function result', () => {
         let returnValue = 5;
         const testFunction = (key) => returnValue;
@@ -15,7 +15,8 @@ describe('memoization', function () {
         returnValue = 10;
         expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
     });
-    //Test Case 2
+
+    //Test Case
     it('should memoize function result for different cache key', () => {
         let returnValue = 5;
         const testFunction = (key) => returnValue;
@@ -31,7 +32,8 @@ describe('memoization', function () {
         expect(memoized('b544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
         expect(memoized('d544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(15);
     });
-    //Test Case 3
+
+    //Test Case
     it('detect cache key provided by resolver and should memoize function result upon resolver provided key', () => {
         let cacheKey = 'c544d3ae';
         const testFunction = (key, firstValue, secondValue) => {
@@ -45,7 +47,8 @@ describe('memoization', function () {
         //Passing different arguments but still value return from cache as cache key detect from resolver
         expect(memoized(cacheKey, 5, 20)).to.equal(15);
     });
-    //Test Case 4
+
+    //Test Case
     it('should memoize function result upon key parameter of original function', () => {
         let cacheKey = 'c544d3ae';
         const testFunction = (key, value) => {
@@ -58,8 +61,18 @@ describe('memoization', function () {
         expect(memoized(cacheKey, 10)).to.equal(10);
         //passing only cache key and memoize function return result based on cache key
         expect(memoized(cacheKey)).to.equal(10);
-        //Passing different arguments but still value return from cache as cache key detect from resolver
+        //Passing different parameter but still value return from cache as cache key remain same
         expect(memoized(cacheKey, 15)).to.equal(10);
+    });
+
+    //Test Case
+    it('should memoize function result without resolver and timeout', () => {
+        let cacheKey = 'c544d3ae', returnValue = 5;
+        const testFunction = (key) => returnValue;
+        const memoized = memoization.memoize(testFunction);
+        expect(memoized(cacheKey)).to.equal(5);
+        //Passing different arguments but still value return from cache as cache key detect from resolver
+        expect(memoized(cacheKey)).to.equal(5);
     });
 
     //Test Suite to test with fake timer
@@ -73,7 +86,7 @@ describe('memoization', function () {
         afterEach(function () {
             clock.restore();
         });
-        //Test Case 5
+        //Test Case
         it('memoize function should cache result until timeout exceeds', () => {
             let returnValue = 5;
 
@@ -93,7 +106,7 @@ describe('memoization', function () {
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
 
         });
-        //Test Case 6
+        //Test Case
         it('memoize function should cache result until timeout exceeds [Tested with frequent changed value]', () => {
 
             const testFunction = (key) => Date.now();
