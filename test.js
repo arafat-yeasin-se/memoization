@@ -5,7 +5,7 @@ const sinon = require('sinon');
 // hint: use https://sinonjs.org/releases/v6.1.5/fake-timers/ for faking timeouts
 
 describe('memoization', function () {
-    //Test Case
+    //Test Case 1
     it('should memoize function result', () => {
         let returnValue = 5;
         const testFunction = (key) => returnValue;
@@ -16,7 +16,7 @@ describe('memoization', function () {
         expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
     });
 
-    //Test Case
+    //Test Case 2
     it('should memoize function result for different cache key', () => {
         let returnValue = 5;
         const testFunction = (key) => returnValue;
@@ -33,7 +33,7 @@ describe('memoization', function () {
         expect(memoized('d544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(15);
     });
 
-    //Test Case
+    //Test Case 3
     it('detect cache key provided by resolver and should memoize function result upon resolver provided key', () => {
         let cacheKey = 'c544d3ae';
         const testFunction = (key, firstValue, secondValue) => {
@@ -48,7 +48,7 @@ describe('memoization', function () {
         expect(memoized(cacheKey, 5, 20)).to.equal(15);
     });
 
-    //Test Case
+    //Test Case 4
     it('should memoize function result upon key parameter of original function', () => {
         let cacheKey = 'c544d3ae';
         const testFunction = (key, value) => {
@@ -65,7 +65,7 @@ describe('memoization', function () {
         expect(memoized(cacheKey, 15)).to.equal(10);
     });
 
-    //Test Case
+    //Test Case 5
     it('should memoize function result without resolver and timeout', () => {
         let cacheKey = 'c544d3ae', returnValue = 5;
         const testFunction = (key) => returnValue;
@@ -88,7 +88,7 @@ describe('memoization', function () {
             timer.restore();
         });
 
-        //Test Case
+        //Test Case 6
         it('memoize function should cache result until timeout exceeds', () => {
             let returnValue = 5;
 
@@ -109,7 +109,7 @@ describe('memoization', function () {
 
         });
 
-        //Test Case
+        //Test Case 7
         it('memoize function should cache result until timeout exceeds [Tested with frequent changed value]', () => {
 
             const testFunction = (key) => Date.now();
@@ -125,6 +125,19 @@ describe('memoization', function () {
             //Timeout exceeds so original function should execute again
             timer.tick(2000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(3021);
+
+        });
+        //Test Case 8
+        it('memoize function should not cache result as timeout set to 0', () => {
+
+            const testFunction = (key) => Date.now();
+
+            const memoized = memoization.memoize(testFunction, (key) => key, 0);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1);
+            timer.tick(20);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.not.equal(1);
+            timer.tick(1000);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1021);
 
         });
     });
