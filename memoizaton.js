@@ -35,6 +35,7 @@ function memoize(func, resolver, timeout) {
     function getNow() {
         return Date.now();
     }
+
     cacheValidTime = getNow();
     if (typeof timeout !== 'undefined' && typeof timeout === 'number') {
         cacheValidTime = getNow() + timeout;
@@ -47,15 +48,13 @@ function memoize(func, resolver, timeout) {
         } else {
             cacheKey = JSON.stringify(arguments);
         }
-        console.log("cacheKey ..." + cacheKey);
         if (cache[cacheKey] && remainingValidTime >= 0) {
-            console.log("Return From Cache ...");
+            console.log('Return from cache ...');
             return cache[cacheKey];
         } else {
-            console.log("Executing Function ... "+arguments.length);
+            console.log('Executing function ...');
             let value = func.apply(this, arguments);
             cache[cacheKey] = value;
-            console.log("value ... "+value);
             return value;
         }
     }
