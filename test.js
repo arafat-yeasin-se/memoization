@@ -77,15 +77,17 @@ describe('memoization', function () {
 
     //Test Suite to test with fake timer
     describe('memoization check with fake timers', function () {
-        let clock;
+        let timer;
         beforeEach(function () {
-            clock = sinon.useFakeTimers({
+            //Initialize fake timer with timestamp 1 and store the reference of the timer
+            timer = sinon.useFakeTimers({
                 now: 1
             });
         });
         afterEach(function () {
-            clock.restore();
+            timer.restore();
         });
+
         //Test Case
         it('memoize function should cache result until timeout exceeds', () => {
             let returnValue = 5;
@@ -95,17 +97,18 @@ describe('memoization', function () {
             const memoized = memoization.memoize(testFunction, (key) => key, 2000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
             returnValue = 10;
-            clock.tick(20);
+            timer.tick(20);
             //Same value should return from cache
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
-            clock.tick(1000);
+            timer.tick(1000);
             //Same value should return from cache as Timeout not exceed
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
             //Timeout exceeds so original function should execute again
-            clock.tick(2000);
+            timer.tick(2000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
 
         });
+
         //Test Case
         it('memoize function should cache result until timeout exceeds [Tested with frequent changed value]', () => {
 
@@ -113,14 +116,14 @@ describe('memoization', function () {
 
             const memoized = memoization.memoize(testFunction, (key) => key, 2000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1);
-            clock.tick(20);
+            timer.tick(20);
             //Same value should return from cache
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1);
-            clock.tick(1000);
+            timer.tick(1000);
             //Same value should return from cache as Timeout not exceed
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1);
             //Timeout exceeds so original function should execute again
-            clock.tick(2000);
+            timer.tick(2000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(3021);
 
         });
