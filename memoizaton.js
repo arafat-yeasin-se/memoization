@@ -39,12 +39,13 @@ function memoize(func, resolver, timeout) {
      * Memoize function implementation upon cache key
      */
     return function () {
-        let remainingValidTime;
+        let remainingValidTime = -1;
         let cacheKey = JSON.stringify(arguments[0]);
 
         //Calculate if memoize function invokes after timeout exceeds.
-        remainingValidTime = cacheValidTime[cacheKey] - getNow();
-
+        if(cacheValidTime[cacheKey]){
+            remainingValidTime = cacheValidTime[cacheKey] - getNow();
+        }
         //Retrieve value from cache only if value exist in cache for given cache key and timeout not exceeds.
         if (cache[cacheKey] && remainingValidTime >= 0) {
             console.log("Return from cache ... ");
