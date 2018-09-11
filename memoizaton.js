@@ -30,43 +30,32 @@
 function memoize(func, resolver, timeout) {
     //Cache the function result.
     let cache = {};
-    let cacheValidTime;
+    let cacheValidTime = {};
 
     function getNow() {
         return Date.now();
     }
-
-    //Cache the timeout.
-    cacheValidTime = getNow();
-    if (typeof timeout !== 'undefined' && typeof timeout === 'number') {
-        cacheValidTime = getNow() + timeout;
-    }
-
     /*
      * Memoize function implementation upon cache key
      */
     return function () {
+        let remainingValidTime;
+        let cacheKey = JSON.stringify(arguments[0]);
+
         //Calculate if memoize function invokes after timeout exceeds.
-        let remainingValidTime = cacheValidTime - getNow();
-        /*
-         * Retrieve cache key from resolver if provided;
-         * otherwise consider first argument of original function as cache key.
-         */
-        let cacheKey;
-        if ((typeof resolver !== 'undefined' && typeof resolver === 'function') && typeof resolver() !== 'undefined') {
-            cacheKey = JSON.stringify(resolver());
-        } else {
-            cacheKey = JSON.stringify(arguments[0]);
-        }
+        remainingValidTime = cacheValidTime[cacheKey] - getNow();
 
         //Retrieve value from cache only if value exist in cache for given cache key and timeout not exceeds.
         if (cache[cacheKey] && remainingValidTime >= 0) {
+            console.log("Return from cache ... ");
             return cache[cacheKey];
         } else {
             //Executing the original function
+            console.log("Function Executeing ... ");
             let value = func.apply(this, arguments);
             //Caching the value
             cache[cacheKey] = value;
+            cacheValidTime[cacheKey] = getNow() + timeout;
             return value;
         }
     }
