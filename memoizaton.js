@@ -40,8 +40,12 @@ function memoize(func, resolver, timeout) {
      */
     return function () {
         let remainingValidTime = -1;
-        let cacheKey = JSON.stringify(arguments[0]);
-
+        let cacheKey;
+        if (typeof resolver !== 'undefined' && typeof resolver === 'function'){
+            cacheKey = resolver.apply(this, arguments);
+        }else{
+            cacheKey = JSON.stringify(arguments[0]);
+        }
         //Calculate if memoize function invokes after timeout exceeds.
         if(cacheValidTime[cacheKey]){
             remainingValidTime = cacheValidTime[cacheKey] - getNow();
