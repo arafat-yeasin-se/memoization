@@ -28,39 +28,47 @@
  * @param timeout   timeout for cached values in milliseconds
  */
 function memoize(func, resolver, timeout) {
-    //Cache the function result.
-    let cache = {};
-    let cacheValidTime = {};
+    //Cache the function result and timeout.
+    let cache = {}, cacheValidTime = {};
+    //Get System current time
     function getNow() {
         return Date.now();
     }
+    //Check if given timeout valid
+    if (typeof timeout === 'undefined' || typeof timeout !== 'number'){
+        timeout = -1;
+    }
     /*
-     * Memoize function implementation upon cache key
+     * Memoize function implementation upon cache key and timeout
      */
     return function () {
         let remainingValidTime = -1;
         let cacheKey;
+        //check if provided resolver provided and has same set of parameter as original function.
         if (typeof resolver !== 'undefined' && typeof resolver === 'function'){
             if(func.length == resolver.length){
                 cacheKey = resolver.apply(this, arguments);
+                console.log("resolver valid");
             }
         }else{
+            //Get first argument of original function as cache key in absence of resolver
             cacheKey = JSON.stringify(arguments[0]);
         }
-        //Calculate if memoize function invokes after timeout exceeds.
+        console.log(cache);
+        //Calculate remaining valid time.
         if(cacheValidTime[cacheKey]){
             remainingValidTime = cacheValidTime[cacheKey] - getNow();
         }
-        //Retrieve value from cache only if value exist in cache for given cache key and timeout not exceeds.
+        //Retrieve value from cache only if value exist in cache for given cache key and if timeout not exceeds.
         if (cache[cacheKey] && remainingValidTime >= 0) {
             console.log("Return from cache ... ");
             return cache[cacheKey];
         } else {
-            //Executing the original function
+            //Executing the original function.
             console.log("Function Executeing ... ");
             let value = func.apply(this, arguments);
-            //Caching the value
-            if(typeof cacheKey !== 'undefined'){
+            //Caching the value if cache key and valid timeout found.
+            if(typeof cacheKey !== 'undefined' && timeout > -1){
                 cache[cacheKey] = value;
                 cacheValidTime[cacheKey] = getNow() + timeout;
             }
