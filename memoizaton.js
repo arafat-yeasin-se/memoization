@@ -34,9 +34,10 @@ function memoize(func, resolver, timeout) {
     function getNow() {
         return Date.now();
     }
+
     //Check if given timeout valid
-    if (typeof timeout === 'undefined' || typeof timeout !== 'number'){
-        timeout = -1;
+    if (typeof timeout === 'undefined' || typeof timeout !== 'number') {
+        timeout = 0;
     }
     /*
      * Memoize function implementation upon cache key and timeout
@@ -45,30 +46,26 @@ function memoize(func, resolver, timeout) {
         let remainingValidTime = -1;
         let cacheKey;
         //check if provided resolver provided and has same set of parameter as original function.
-        if (typeof resolver !== 'undefined' && typeof resolver === 'function'){
-            if(func.length == resolver.length){
+        if (typeof resolver !== 'undefined' && typeof resolver === 'function') {
+            if (func.length == resolver.length) {
                 cacheKey = resolver.apply(this, arguments);
-                console.log("resolver valid");
             }
-        }else{
+        } else {
             //Get first argument of original function as cache key in absence of resolver
             cacheKey = JSON.stringify(arguments[0]);
         }
-        console.log(cache);
         //Calculate remaining valid time.
-        if(cacheValidTime[cacheKey]){
+        if (cacheValidTime[cacheKey]) {
             remainingValidTime = cacheValidTime[cacheKey] - getNow();
         }
         //Retrieve value from cache only if value exist in cache for given cache key and if timeout not exceeds.
-        if (cache[cacheKey] && remainingValidTime >= 0) {
-            console.log("Return from cache ... ");
+        if (cache[cacheKey] && remainingValidTime > 0) {
             return cache[cacheKey];
         } else {
             //Executing the original function.
-            console.log("Function Executeing ... ");
             let value = func.apply(this, arguments);
             //Caching the value if cache key and valid timeout found.
-            if(typeof cacheKey !== 'undefined' && timeout > -1){
+            if (typeof cacheKey !== 'undefined' && timeout > 0) {
                 cache[cacheKey] = value;
                 cacheValidTime[cacheKey] = getNow() + timeout;
             }
