@@ -9,9 +9,9 @@ describe('memoization', function () {
     afterEach(() => originalFunctionSpy.resetHistory());
 
     //Test Case 1
-    /*it('should memoize function result', () =>{
+    it('test should memoize function result', () => {
         let returnValue = 5;
-        const testFunction =  (key) => returnValue;
+        const testFunction = (key) => returnValue;
 
         const memoized = memoization.memoize(testFunction, (key) => key, 1000);
         expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
@@ -19,11 +19,11 @@ describe('memoization', function () {
         returnValue = 10;
 
         expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
-    });*/
-    /*//Test Case 2
-    it('should not memoize function result as resolver does not have same set of parameter as original function', () =>{
+    });
+    //Test Case 2
+    it('test should not memoize function result as resolver does not have same set of parameter as original function', () => {
         let returnValue = 5;
-        const testFunction =  (key, param1) => returnValue;
+        const testFunction = (key, param1) => returnValue;
 
         const memoized = memoization.memoize(testFunction, (key) => key, 1000);
         expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
@@ -31,25 +31,46 @@ describe('memoization', function () {
         returnValue = 10;
 
         expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
-    });*/
-   /* //Test Case 3
-    it('test original function executed', () =>{
+    });
+    //Test Case 3
+    it('test original function executed with given arguments of memorized function', () => {
         let returnValue = 5;
         const memoized = memoization.memoize(originalFunctionSpy, () => returnValue, 1000);
+
         memoized('c544d3ae-a72d-4755-8ce5-d25db415b776');
+
         expect(originalFunctionSpy.withArgs('c544d3ae-a72d-4755-8ce5-d25db415b776').callCount).to.equal(1);
-    });*/
+    });
     //Test Case 4
-    /*it('test original function and resolver called with same set of arguments', () =>{
+    it('test original function and resolver called with same set of arguments passed by memorized function', () => {
         let returnValue = 5;
         let resolverFunctionSpy = sinon.spy();
 
         const memoized = memoization.memoize(originalFunctionSpy, resolverFunctionSpy, 1000);
-        memoized('c544d3ae-a72d-4755-8ce5-d25db415b776',19);
+
+        memoized('c544d3ae-a72d-4755-8ce5-d25db415b776', 19);
+
         expect(originalFunctionSpy.withArgs('c544d3ae-a72d-4755-8ce5-d25db415b776', 19).calledOnce).to.equal(true);
         expect(resolverFunctionSpy.withArgs('c544d3ae-a72d-4755-8ce5-d25db415b776', 19).calledOnce).to.equal(true);
+
         resolverFunctionSpy.resetHistory();
-    });*/
+    });
+    //Test Case 5
+    it('test memoize function should not cache result as resolver and timeout absent', () => {
+
+        let returnValue = 5;
+        const testFunction = (key) => returnValue;
+
+        const memoized = memoization.memoize(testFunction);
+        expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
+
+        returnValue = 10;
+        expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
+
+        returnValue = 20;
+        expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(20);
+
+    });
     //Test Suite to test with fake timer
     describe('memoization check with fake timers', function () {
         let timer;
@@ -61,52 +82,62 @@ describe('memoization', function () {
         });
         afterEach(() => timer.restore());
 
-        /*//Test Case 2
-        it('memoize function should cache result until individual memorize function timeout exceeds', () => {
+        //Test Case 6
+        it('test memoize function should cache result until individual memorize function timeout exceeds', () => {
             let returnValue = 5;
 
             const testFunction = (key) => returnValue;
 
             const memoized = memoization.memoize(testFunction, (key) => key, 2000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
+
             returnValue = 10;
             timer.tick(1000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
             expect(memoized('vkyky544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
-            //expect(memoized('v544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
+
             timer.tick(1021);
             returnValue = 20;
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(20);
             expect(memoized('vkyky544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(10);
+
             timer.tick(1000);
             expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(20);
             expect(memoized('vkyky544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(20);
-        });*/
+        });
 
-       ///Test Case 3
-        it('should not memoize function as timeout ', () => {
+        //Test Case 7
+        it('test should not memoize function as timeout set to 0', () => {
 
             let returnValue = 5;
-c
-            const testFunction = (key, param1) => returnValue;
-
-            const memoized = memoization.memoize(testFunction, (key,param1) => key, 2000);
-            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
-            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
-
-        });
-        /*//Test Case 4
-        it('memoize function should not cache result as timeout set to 0', () => {
-
-            const testFunction = (key) => Date.now();
+            const testFunction = (key) => returnValue;
 
             const memoized = memoization.memoize(testFunction, (key) => key, 0);
-            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1);
-            timer.tick(20);
-            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.not.equal(1);
-            timer.tick(1000);
-            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(1021);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(5);
+            returnValue = 20;
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(20);
+            returnValue = 30;
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776')).to.equal(30);
 
-        });*/
+        });
+        //Test Case 8
+        it('test should memoize function by considering first argument of memoized function as cache key', () => {
+
+            let returnValue = 5;
+            const testFunction = (key, param1) => returnValue;
+
+            const memoized = memoization.memoize(testFunction, null, 2000);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776', 'omicron')).to.equal(5);
+            returnValue = 10;
+            timer.tick(1000);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776', 'klaus')).to.equal(5);
+            timer.tick(1021);
+            returnValue = 20;
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776', 'austria')).to.equal(20);
+            expect(memoized('vkyky544d3ae-a72d-4755-8ce5-d25db415b776', 'omicron')).to.equal(20);
+            timer.tick(1000);
+            expect(memoized('c544d3ae-a72d-4755-8ce5-d25db415b776', 'omicron')).to.equal(20);
+            expect(memoized('vkyky544d3ae-a72d-4755-8ce5-d25db415b776', 'austria')).to.equal(20);
+        });
     });
 });
