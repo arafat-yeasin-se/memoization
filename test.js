@@ -83,7 +83,7 @@ describe('memoization', function () {
         afterEach(() => timer.restore());
 
         //Test Case 6
-        it('test memoize function should cache result until individual memorize function timeout exceeds', () => {
+        it('test should cache result until individual memorize function timeout exceeds', () => {
             let returnValue = 5;
 
             const testFunction = (key) => returnValue;
@@ -121,7 +121,7 @@ describe('memoization', function () {
 
         });
         //Test Case 8
-        it('test should memoize function by considering first argument of memoized function as cache key', () => {
+        it('test should memoize function by considering first argument of memorized function as cache key', () => {
 
             let returnValue = 5;
             const testFunction = (key, param1) => returnValue;
