@@ -27,18 +27,33 @@
  *                  original function, the resolver function should provide the memoization key.
  * @param timeout   timeout for cached values in milliseconds
  */
+const sizeof = require('object-sizeof');
+
 function memoize(func, resolver, timeout) {
     //Cache the function result and timeout.
-    let cache = {}, cacheValidTime = {}, productionMode = true;
+    let cacheStore, primaryCache = {}, secondaryCache = {}, normalCache = {};
+    const productionMode = false, maxObjectCache = 20000000;
     //Get System current time
     function getNow() {
         return Date.now();
     }
 
+    function setCacheStore() {
+        if (sizeof(primaryCache) < maxObjectCache) {
+            console.log('primary....');
+            cacheStore = primaryCache;
+        } else if (sizeof(secondaryCache) < maxObjectCache) {
+            cacheStore = secondaryCache;
+        } else {
+            cacheStore = normalCache;
+        }
+        //TODO: If all stores full of memory then delete some cache from cache stores upon requirements like method call frequency, rapidly fill up store and etc.
+    }
+
     //Track previous system time
     let previousTime = getNow();
     //After every 10 seconds check if system time Jumps
-    if(productionMode){
+    if (productionMode) {
         setInterval(function () {
             //Calculate time difference between before and after system time execution
             let timeDiff = getNow() - previousTime;
@@ -50,8 +65,7 @@ function memoize(func, resolver, timeout) {
              * */
             if (timeDiff < 0 || timeDiff > 15000) {
                 //Invalidate all caches
-                cache = {};
-                cacheValidTime = {};
+                cacheStore = {};
                 //TODO: if application requirements define that cache will not invalidate even if system time jumps then application need to recalculate timeout cache.
                 /*
                  * cache remaining valid time and cacheValidTime
@@ -69,6 +83,7 @@ function memoize(func, resolver, timeout) {
      * Memoize function implementation upon cache key and timeout
      */
     return function () {
+        setCacheStore();
         let remainingValidTime = -1;
         let cacheKey;
         //check if provided resolver provided and has same set of parameter as original function.
@@ -80,24 +95,30 @@ function memoize(func, resolver, timeout) {
             //Get first argument of original function as cache key in absence of resolver
             cacheKey = JSON.stringify(arguments[0]);
         }
+        let tempCacheStore = Object.assign({}, primaryCache, secondaryCache, normalCache);
+        //console.log('tempCacheStore: '+JSON.stringify(tempCacheStore));
         //Calculate remaining valid time.
-        if (cacheValidTime[cacheKey]) {
-            remainingValidTime = cacheValidTime[cacheKey] - getNow();
+        const tempCache = tempCacheStore[cacheKey];
+        //console.log('tempCache: '+JSON.stringify(tempCache));
+        if (tempCache && tempCache.cacheValidTime) {
+            remainingValidTime = tempCache.cacheValidTime - getNow();
         }
         //Retrieve value from cache only if value exist in cache for given cache key and if timeout not exceeds.
-        if (cache[cacheKey] && remainingValidTime > 0) {
+        if (tempCache && remainingValidTime > 0) {
             console.log('Return from cache ...');
-            return cache[cacheKey];
+            return tempCacheStore[cacheKey].value;
         } else {
             //Executing the original function.
-            let value = func.apply(this, arguments);
+            let result = func.apply(this, arguments);
             console.log('Executing function ...');
             //Caching the value if cache key and valid timeout found.
             if (typeof cacheKey !== 'undefined' && timeout > 0) {
-                cache[cacheKey] = value;
-                cacheValidTime[cacheKey] = getNow() + timeout;
+                let temp = {};
+                temp['value'] = result;
+                temp['cacheValidTime'] = getNow() + timeout;
+                cacheStore[cacheKey] = temp;
             }
-            return value;
+            return result;
         }
     }
 }
