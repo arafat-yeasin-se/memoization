@@ -35,6 +35,25 @@ function memoize(func, resolver, timeout) {
         return Date.now();
     }
 
+    //Track previous system time
+    let previousTime = getNow();
+    //After every 10 seconds check if system time Jumps
+    setInterval(function () {
+        //Calculate time difference between before and after system time execution
+        let timeDiff = getNow() - previousTime;
+        previousTime = getNow();
+        /*
+         * If system time jumps backward or upward then invalidate cache.
+         * Here upward time consider a 5 seconds buffer;
+         * As there might be some delay to place callback function in the engine call stack.
+         * */
+        if (timeDiff < 0 || timeDiff > 15000) {
+            //Invalidate all caches
+            cache = {};
+            cacheValidTime = {};
+        }
+    }, 10000);
+
     //Check if given timeout valid
     if (typeof timeout === 'undefined' || typeof timeout !== 'number') {
         timeout = 0;
@@ -60,10 +79,12 @@ function memoize(func, resolver, timeout) {
         }
         //Retrieve value from cache only if value exist in cache for given cache key and if timeout not exceeds.
         if (cache[cacheKey] && remainingValidTime > 0) {
+            console.log('Return from cache ...');
             return cache[cacheKey];
         } else {
             //Executing the original function.
             let value = func.apply(this, arguments);
+            console.log('Executing function ...');
             //Caching the value if cache key and valid timeout found.
             if (typeof cacheKey !== 'undefined' && timeout > 0) {
                 cache[cacheKey] = value;
