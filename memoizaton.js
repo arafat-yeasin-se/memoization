@@ -43,7 +43,7 @@ function memoize(func, resolver, timeout) {
         let timeDiff = getNow() - previousTime;
         previousTime = getNow();
         /*
-         * If system time jumps backward or upward then invalidate cache.
+         * If system time jumps backward or forward then invalidate cache.
          * Here upward time consider a 5 seconds buffer;
          * As there might be some delay to place callback function in the engine call stack.
          * */
@@ -51,6 +51,12 @@ function memoize(func, resolver, timeout) {
             //Invalidate all caches
             cache = {};
             cacheValidTime = {};
+            //TODO: if application requirements define that cache will not invalidate even if system time jumps then application need to recalculate timeout cache.
+            /*
+             * cache remaining valid time and cacheValidTime
+             * cacheValidTime[cacheKey] = getNow() + remainingValidTime
+             * Please follow draft sce
+             * */
         }
     }, 10000);
 

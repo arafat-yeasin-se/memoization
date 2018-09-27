@@ -1,0 +1,38 @@
+bt - Buffer time, st - System time, cvt - CacheValidTime, to - Timeout, rvt - Remaining valid time
+#########
+bt : 3
+-----------------------------------
+Backward System Jump Scenario
+
+st : 8
+cvt : st(8) + to(20) = 28
+rvt : cvt(28) - st(9) = 19
+-----------------------------------
+Backward System Jump
+st : 6
+cvt : st(6) + rvt(19 - bt (3)) = 22
+-----------------------------------
+rvt : cvt(22) - st(6) = 16
+-----------------------------------
+repeat (rt > 0 -> return from cache)
+st : 8
+rvt : cvt(22) - st(8) = 14
+-----------------------------------
+
+
+
+Forward System Jump Scenario
+
+st : 8
+cvt : st(8) + to(20) = 28
+rvt : cvt(28) - st(9) = 19
+-----------------------------------
+Forward System Jump
+st : 20
+cvt : st(20) + rvt(19 - bt (3)) = 36
+-----------------------------------
+rvt : cvt(36) - st(20) = 16
+-----------------------------------
+repeat (rt > 0 -> return from cache)
+st : 8
+rvt : cvt(22) - st(8) = 14
