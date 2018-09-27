@@ -29,7 +29,7 @@
  */
 function memoize(func, resolver, timeout) {
     //Cache the function result and timeout.
-    let cache = {}, cacheValidTime = {};
+    let cache = {}, cacheValidTime = {}, productionMode = true;
     //Get System current time
     function getNow() {
         return Date.now();
@@ -38,28 +38,29 @@ function memoize(func, resolver, timeout) {
     //Track previous system time
     let previousTime = getNow();
     //After every 10 seconds check if system time Jumps
-    setInterval(function () {
-        //Calculate time difference between before and after system time execution
-        let timeDiff = getNow() - previousTime;
-        previousTime = getNow();
-        /*
-         * If system time jumps backward or forward then invalidate cache.
-         * Here upward time consider a 5 seconds buffer;
-         * As there might be some delay to place callback function in the engine call stack.
-         * */
-        if (timeDiff < 0 || timeDiff > 15000) {
-            //Invalidate all caches
-            cache = {};
-            cacheValidTime = {};
-            //TODO: if application requirements define that cache will not invalidate even if system time jumps then application need to recalculate timeout cache.
+    if(productionMode){
+        setInterval(function () {
+            //Calculate time difference between before and after system time execution
+            let timeDiff = getNow() - previousTime;
+            previousTime = getNow();
             /*
-             * cache remaining valid time and cacheValidTime
-             * cacheValidTime[cacheKey] = getNow() + remainingValidTime
-             * Please follow draft sce
+             * If system time jumps backward or forward then invalidate cache.
+             * Here upward time consider a 5 seconds buffer;
+             * As there might be some delay to place callback function in the engine call stack.
              * */
-        }
-    }, 10000);
-
+            if (timeDiff < 0 || timeDiff > 15000) {
+                //Invalidate all caches
+                cache = {};
+                cacheValidTime = {};
+                //TODO: if application requirements define that cache will not invalidate even if system time jumps then application need to recalculate timeout cache.
+                /*
+                 * cache remaining valid time and cacheValidTime
+                 * cacheValidTime[cacheKey] = getNow() + remainingValidTime
+                 * Please follow draft sce
+                 * */
+            }
+        }, 10000);
+    }
     //Check if given timeout valid
     if (typeof timeout === 'undefined' || typeof timeout !== 'number') {
         timeout = 0;
