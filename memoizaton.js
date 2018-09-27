@@ -39,6 +39,7 @@ function memoize(func, resolver, timeout) {
     }
 
     function setCacheStore() {
+        //TODO: Select cache store upon memorized function calling frequency based on cache key
         if (sizeof(primaryCache) < maxObjectCache) {
             console.log('primary....');
             cacheStore = primaryCache;
@@ -83,6 +84,7 @@ function memoize(func, resolver, timeout) {
      * Memoize function implementation upon cache key and timeout
      */
     return function () {
+        //TODO: Detect Original/Memorize function calling frequency
         setCacheStore();
         let remainingValidTime = -1;
         let cacheKey;
@@ -106,6 +108,7 @@ function memoize(func, resolver, timeout) {
         //Retrieve value from cache only if value exist in cache for given cache key and if timeout not exceeds.
         if (tempCache && remainingValidTime > 0) {
             console.log('Return from cache ...');
+            //TODO: cache remaining valid time in cache object
             return tempCacheStore[cacheKey].value;
         } else {
             //Executing the original function.
